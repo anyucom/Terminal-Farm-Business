@@ -7,7 +7,7 @@
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)
 
 **下一代全自动QQ农场经典版云托管系统：稳定、高效、极客、不仅是工具，更是一套完整的商业化解决方案。**
-
+演示站：http://42.121.252.209:8888/
 > [!NOTE]
 > **项目背景与来源**
 > 本项目是基于开源项目 [StringKe/terminal-farm](https://github.com/StringKe/terminal-farm) 进行的深度重构与二次开发。
