@@ -1,13 +1,41 @@
 # 🚜 Terminal-Farm-Business | 终端农场商业版
 
+<div align="center">
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D20-green.svg)
 ![Bun](https://img.shields.io/badge/bun-%3E%3D1.2-orange.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-%3E%3D5.0-blue.svg)
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)
 
-**下一代全自动QQ农场经典版云托管系统：稳定、高效、极客、不仅是工具，更是一套完整的商业化解决方案。**
-演示站：http://42.121.252.209:8888/
+**下一代全自动 QQ 农场经典版云托管系统**
+
+*稳定、高效、极客，不仅是工具，更是一套完整的商业化解决方案。*
+
+</div>
+
+---
+
+### 🌐 在线体验
+
+* **演示站点**：[http://112.124.43.11:8888/](http://112.124.43.11:8888/)
+
+> **💡 提示**：为方便开发者与用户测试，系统提供了以下演示卡密，可直接在登录界面使用。
+
+#### 🔑 演示测试卡密
+
+```text
+FARM-MLZ0TMDW-00317B79
+FARM-MLZ0TMDX-44C35D5B
+FARM-MLZ0TMDX-AA2E33DC
+FARM-MLZ0TMDX-C867AF05
+FARM-MLZ0TMDX-CFD08C04
+FARM-MLZ0TMDX-0678BB14
+FARM-MLZ0TMDX-9E87EFD9
+FARM-MLZ0TMDX-431A8508
+FARM-MLZ0TMDX-FFBB5443
+FARM-MLZ0TMDX-6F4DD1BA
+```
 
 <br/>
 
@@ -31,8 +59,6 @@
 > 区别于市面上大多数“单机直连”或“单一全局代理”的开源项目，本项目内置了**工业级代理隔离分流引擎**。每个挂机账号都可以被智能调度到不同的代理节点上，实现真正的**一号一放、多路分流**。这是规避大规模封号、保障账号安全的基石级功能。
 
 [English Brief](#guide-en) | **[中文详细深度指南](#guide-zh)**
-
-</div>
 
 ---
 
@@ -99,10 +125,10 @@
 ```mermaid
 graph TD
     A[用户浏览器] <-->|HTTP/WS| B[Nginx 反向代理]
-    B <-->|Port 8888| C[React 前端静态资源]
+    B <-->|Port 80| C[React 前端静态资源]
     B <-->|Port 2222| D[Bun 核心 API / Admin Server]
     D <-->|WebSocket| E[游戏服务器]
-    D <-->|Port 3001| F[QRLib 登录服务]
+    D <-->|Port 11451| F[QRLib 扫码微服务]
     D <-->|HTTP| G[AstrBot 机器人]
     D --- H[(Local JSON DB / .proxies.txt)]
 ```
@@ -146,43 +172,87 @@ socks5://user:pass@5.6.7.8:1080
 
 ---
 
-## 🚀 极致部署教程 (Step-by-Step)
+## 🚀 极致部署教程 (避坑版生产环境)
 
-### 1. 服务器选购与环境配置
--   **硬件推荐**：2核 4G 环境下可支持 200 个以上账号并发。
--   **系统镜像**：首选 **Ubuntu 22.04 LTS**。
--   **安全组配置**：
-    -   必须放行端口：`8888` (网页), `2222` (主控), `3001` (登录), `11454` (API)。
+本教程适用于干净的 Ubuntu 服务器（推荐 22.04 LTS 及以上），已修复原版依赖遗漏问题。
 
-### 2. 初始化运行环境
+### 1. 基础环境配置 (Node.js, Bun, Nginx)
+请先更新系统，并安装必要的运行环境与 Web 服务器：
 ```bash
-# 更新并购买大脑插件
+# 更新系统并安装基础工具与 Nginx
 sudo apt update && sudo apt upgrade -y
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y curl git nginx
+
+# 安装 Node.js (20.x)
+curl -fsSL [https://deb.nodesource.com/setup_20.x](https://deb.nodesource.com/setup_20.x) | sudo -E bash -
 sudo apt-get install -y nodejs
-curl -fsSL https://bun.sh/install | bash && source ~/.bashrc
-sudo npm install pm2 -g
+
+# 安装 Bun 引擎并重载环境变量
+curl -fsSL [https://bun.sh/install](https://bun.sh/install) | bash
+source ~/.bashrc 
 ```
 
-### 3. 一键神级部署 (Recommended)
-我们为你封装了 `deploy.sh` 脚本，它整合了专业全栈工程师的日常部署流程：
+### 2. 克隆项目与基础配置
 ```bash
-git clone https://github.com/YOUR_USERNAME/terminal-farm.git
-cd terminal-farm
+git clone [https://github.com/RoseKhlifa/Terminal-Farm-Business.git](https://github.com/RoseKhlifa/Terminal-Farm-Business.git)
+cd Terminal-Farm-Business
+
+# 复制环境变量配置文件并根据需要修改
+cp .env.example .env
+
+# 【重要】创建缺失的版本信息文件，防止后端启动崩溃
+echo '{"version": "1.0.0"}' > .version.json
+```
+
+### 3. 执行核心服务一键部署
+赋予脚本执行权限并运行，此过程将安装后端依赖并构建前端：
+```bash
 chmod +x deploy.sh
 sudo ./deploy.sh
 ```
-**脚本会自动完成以下动作**：
-1. `bun install` 安装所有后端核心依赖。
-2. 递归进入 `web-terminal` 进行前端构建。
-3. 将构建产物部署到 `/var/www/farm`。
-4. 自动识别路径并生成 Systemd 系统服务。
-5. 自动配置 Nginx 反向代理。
 
-### 4. 访问与初始化
--   **前端页面**：`http://服务器IP:8888`
--   **管理后台**：`http://服务器IP:2222`
-    -   **初始密码**：`YOUR_ADMIN_PASSWORD` (请第一时间在“系统设置”中修改)。
+### 4. 配置 Nginx 反向代理
+`deploy.sh` 运行完后需手动链接配置并覆盖默认页面：
+```bash
+# 复制配置文件
+sudo cp /root/Terminal-Farm-Business/nginx.conf /etc/nginx/sites-available/farm.conf
+
+# 将配置文件中的 YOUR_DOMAIN.com 替换为 _（代表允许所有 IP 访问）
+sudo sed -i 's/YOUR_[DOMAIN.com/_/g](https://DOMAIN.com/_/g)' /etc/nginx/sites-available/farm.conf
+
+# 移除 Nginx 默认页面，并启用农场项目路由
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo ln -s /etc/nginx/sites-available/farm.conf /etc/nginx/sites-enabled/
+
+# 检查语法并重启 Nginx
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### 5. 启动 QRLib 扫码微服务 (关键)
+必须单独启动该服务，否则面板登录时会提示 `500 QRLib 服务未启动`：
+```bash
+# 进入微服务目录并安装 Node 依赖
+cd /root/Terminal-Farm-Business/QRLib-main
+npm install
+
+# 将服务文件复制到系统并设置开机自启
+sudo cp /root/Terminal-Farm-Business/qrlib.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now qrlib
+
+# 确认服务状态 (需显示 active running)
+sudo systemctl status qrlib
+```
+
+### 6. 端口放行与访问
+请确保你的云服务器**安全组（防火墙）**中放行了以下端口：
+* **80** 端口 (TCP)：用于前端 Web 面板访问。
+* **2222** 端口 (TCP)：用于管理后台访问。
+
+-   **前端页面**：`http://你的服务器IP`
+-   **管理后台**：`http://你的服务器IP:2222`
+    -   **初始密码**：请参考 `.env` 文件中的设置 (请第一时间修改)。
 
 ---
 
@@ -194,6 +264,7 @@ sudo ./deploy.sh
 - `/web-terminal`: 基于 React 的前端源码。
 - `/main.py`: AstrBot 机器人插件代码。
 - `/proto`: 游戏原始及解密后的 Protobuf 定义。
+- `/QRLib-main`: 独立的 QQ 扫码/登录鉴权微服务。
 
 ### 后期更新命令
 如果您拉取了新的代码，只需再次运行：
@@ -203,7 +274,7 @@ git pull && sudo ./deploy.sh
 
 ---
 
-## � 内部授权与卡密逻辑 (Licensing Logic)
+## 🔐 内部授权与卡密逻辑 (Licensing Logic)
 
 本项目内置了一套严谨的授权校验体系，确保商业化运营的安全性：
 
@@ -242,11 +313,11 @@ git pull && sudo ./deploy.sh
 | 现象 | 可能原因 | 解决方案 |
 | :--- | :--- | :--- |
 | `Bun not found` | 环境变量未生效 | 运行 `source ~/.bashrc` 或手动添加 Bun 路径 |
-| `Nginx 502` | API 服务未运行 | `systemctl status farm-api` 查看服务是否崩溃 |
-| `Port 2222 busy` | 端口被其他程序占用 | `lsof -i :2222` 查进程并杀掉，或修改 `.env` 端口 |
+| `Nginx 502` / `80 端口无法访问` | API / Web 服务未就绪 | `systemctl status farm-api` 及 `systemctl status nginx` 检查 |
+| `500 QRLib 服务未启动` | QRLib 微服务宕机 | 检查 11451 端口及 `systemctl status qrlib` 运行状态 |
+| `Port 2222 busy` | 端口被占用 | `lsof -i :2222` 查进程并杀掉，或修改 `.env` 端口 |
 | `Permission denied` | 执行权限不足 | 为脚本添加权限：`chmod +x deploy.sh` |
 | `Build failed` | 内存不足 (OOM) | 建议开启 Swap 或升级到至少 2GB RAM 的服务器 |
-| `CORS Error` | Nginx 配置域名不符 | 检查 `nginx.conf` 中的 `server_name` 是否正确 |
 | `Login Timeout` | 代理池连通性差 | 暂注 `.proxies.txt` 所有内容，测试直连是否成功 |
 
 ---
@@ -256,7 +327,6 @@ git pull && sudo ./deploy.sh
 作为一套生产级别的托管系统，我们强烈建议您：
 1. **强制开启 HTTPS**：通过 Nginx 和 Certbot 部署 SSL 证书。
 2. **修改默认凭据**：
-   - 立即更改 `YOUR_ADMIN_PASSWORD`。
    - 建议在安全组中仅对您的个人 IP 开放 `2222` 管理端口。
 3. **定期清理日志**：
    - 虽然系统会自动轮转日志，但定期手动运行 `rm -rf logs/*.log` 可释放磁盘空间。
