@@ -47,8 +47,8 @@ class FarmRankBot(Star):
              if bots:
                  self.bot = bots[0]
 
-        self.api_url = "http://YOUR_SERVER_IP:2222/api/admin"
-        self.admin_password = "YOUR_ADMIN_PASSWORD"
+        self.api_url = "http://38.76.204.145:2222/api/admin"
+        self.admin_password = xiaoan555
         self.token = ""
 
         self.ERROR_MAP = {
@@ -80,13 +80,13 @@ class FarmRankBot(Star):
     def default_cfg(self) -> Dict[str, Any]:
         return {
             "enabled": False,
-            "adminUrl": "http://YOUR_SERVER_IP:2222",
+            "adminUrl": "http://38.76.204.145:2222",
             "groupId": "",
             "groupIds": "",
             "adText": "想尝试云端代挂？发送 /buy",
             "adIntervalMin": 60,
             "reportIntervalSec": 300,
-            "buyText": "云端代挂购买链接：\nhttps://YOUR_SHOP_URL/buy\n\n可私聊管理员获取最新优惠。",
+            "buyText": "云端代挂购买：\n卖给狗都不卖给你",
             "alertEnabled": True,
         }
 
@@ -133,7 +133,7 @@ class FarmRankBot(Star):
 
     def buy_text(self) -> str:
         text = str(self.merged_cfg().get("buyText") or "").strip()
-        return text or "云端代挂购买链接：\nhttps://example.com/buy"
+        return text or "云端代挂购买链接：\n卖给狗都不卖给你"
 
     # ----------------------------
     # HTTP helpers
